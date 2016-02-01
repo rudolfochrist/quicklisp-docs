@@ -33,7 +33,7 @@ Install libraries with quicklisp as usual
 
 : (ql:quickload :alexandria)
 
-Per default, this installed the documentation under =~/quicklisp/docs/=. This can be customized by setting
+Per default, this installs the documentation under =~/quicklisp/docs/=. This can be customized by setting
 =*ql-docs-home*=.
 
 ** Emacs Side (optional)
