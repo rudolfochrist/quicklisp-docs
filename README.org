@@ -52,3 +52,9 @@ Example configuration:
 
 If you install a new library during a REPL session, call =ql-docs-reload-docs= again to fetch the new
 documentation.
+
+* License
+
+MIT
+
+See [[file:LICENSE][LICENSE]].
