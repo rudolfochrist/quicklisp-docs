@@ -38,7 +38,8 @@
                         :if-exists nil)
     (format file *emacs-lib-template* symbols)))
 
-(defmethod quickload :after (systems &key)
+(defmethod quickload :after (systems &key verbose silent prompt explain)
+  (declare (ignore verbose silent prompt explain))
   (when (atom systems)
     (setf systems (list systems)))
   (loop for system in systems
