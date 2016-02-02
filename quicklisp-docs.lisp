@@ -32,12 +32,11 @@
                     (concatenate 'string "file://" path "#" downcase-symbol))
               symbols)))))
 
-(defun write-emacs-file (system doc-path)
-  (let ((symbols (make-external-symbol-table system doc-path)))
-    (with-open-file (file (make-doc-path system :extension "el")
-                          :direction :output
-                          :if-exists nil)
-      (format file *emacs-lib-template* symbols))))
+(defun write-emacs-file (system symbols)
+  (with-open-file (file (make-doc-path system :extension "el")
+                        :direction :output
+                        :if-exists nil)
+    (format file *emacs-lib-template* symbols)))
 
 (defmethod quickload :after (systems &key)
   (when (atom systems)
@@ -47,10 +46,11 @@
        (let ((path (make-doc-path system)))
          (unless (file-exists-p path)
            (if (find-package system)
-               (progn
-                 (create-template system :target path)
-                 (write-emacs-file system path)
-                 (print "Documentation created."))
+               (let ((symbols (make-external-symbol-table system path)))
+                 (unless (null symbols)
+                   (create-template system :target path)
+                   (write-emacs-file system symbols)
+                   (print "Documentation created.")))
                (error "Cannot find package ~A" system))))))
 
 
