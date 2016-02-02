@@ -46,13 +46,12 @@
      do
        (let ((path (make-doc-path system)))
          (unless (file-exists-p path)
-           (if (find-package system)
-               (let ((symbols (make-external-symbol-table system path)))
-                 (unless (null symbols)
-                   (create-template system :target path)
-                   (write-emacs-file system symbols)
-                   (print "Documentation created.")))
-               (error "Cannot find package ~A" system))))))
+           (when (find-package system)
+             (let ((symbols (make-external-symbol-table system path)))
+               (unless (null symbols)
+                 (create-template system :target path)
+                 (write-emacs-file system symbols)
+                 (print "Documentation created."))))))))
 
 
 ;;; TODO: cleanup docs. This checks for outdated docs in *ql-docs-home* and deletes them
