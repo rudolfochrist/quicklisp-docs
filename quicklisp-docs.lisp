@@ -38,11 +38,11 @@
                         :if-exists nil)
     (format file *emacs-lib-template* symbols)))
 
-(defmethod quickload :after (systems &key verbose silent prompt explain)
+(defmethod quickload :after (system-specs &key verbose silent prompt explain)
   (declare (ignore verbose silent prompt explain))
-  (when (atom systems)
-    (setf systems (list systems)))
-  (loop for system in systems
+  (when (atom system-specs)
+    (setf system-specs (list system-specs)))
+  (loop for system in system-specs
      do
        (let ((path (make-doc-path system)))
          (unless (file-exists-p path)
@@ -54,4 +54,18 @@
                  (print "Documentation created."))))))))
 
 
-;;; TODO: cleanup docs. This checks for outdated docs in *ql-docs-home* and deletes them
+(defun remove-outdated-docs ()
+  "Removes outdated docs."
+  (let ((paths (remove-if (lambda (path)
+                            (string= "el" (pathname-type path)))
+                          (list-directory *ql-docs-home*))))
+    (loop for path in paths
+       do (ppcre:do-register-groups (name version)
+              (".*/(.*)-(\\d\..*)\.html" (namestring path))
+            (let ((system (asdf:find-system name)))
+              (when (and system
+                         (not (string= version
+                                       (asdf:component-version system))))
+                (delete-file path)
+                (delete-file (make-pathname :type "el"
+                                            :defaults path))))))))

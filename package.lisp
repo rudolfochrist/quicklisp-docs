@@ -7,4 +7,5 @@
   (:import-from #:documentation-template
                 #:create-template)
   (:export
-   #:*ql-docs-home*))
+   #:*ql-docs-home*
+   #:remove-outdated-docs))
