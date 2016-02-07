@@ -1,12 +1,25 @@
 ;;;; quicklisp-docs.asd
 
 (asdf:defsystem #:quicklisp-docs
-  :description "Generate documentation for quicklisp installed libraries."
+  :description "Documentation generator for Quicklisp installed libraries."
   :version "0.1"
   :author "Sebastian Christ <rudolfo.christ@gmail.com>"
   :license "MIT"
+  :homepage "https://github.com/rudolfochrist/quicklisp-docs"
+  :source-control (:git "git@github.com:rudolfochrist/quicklisp-docs.git")
   :serial t
   :components ((:file "package")
                (:file "quicklisp-docs"))
   :depends-on (#:documentation-template
-               #:cl-fad))
+               #:cl-fad
+               #:cl-ppcre)
+  :in-order-to ((test-op (test-op quicklisp-docs.test))))
+
+(asdf:defsystem #:quicklisp-docs.test
+  :serial t
+  :components ((:file "tests"))
+  :depends-on (#:1am
+               #:cl-fad
+               #:quicklisp-docs)
+  :perform (test-op (o c)
+                    (uiop:symbol-call :1am :run)))
