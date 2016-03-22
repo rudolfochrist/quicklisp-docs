@@ -9,6 +9,6 @@
                 #:create-template)
   (:export
    #:*ql-docs-home*
-   #:remove-outdated-docs
    #:*excluded-systems*
+   #:remove-outdated-docs
    #:exclude-system))
