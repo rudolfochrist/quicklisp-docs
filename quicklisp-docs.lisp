@@ -43,6 +43,7 @@
   (when (atom system-specs)
     (setf system-specs (list system-specs)))
   (loop for system in system-specs
+     unless (member system *excluded-systems*)
      do
        (let ((path (make-doc-path system)))
          (unless (file-exists-p path)
@@ -62,10 +63,18 @@
     (loop for path in paths
        do (ppcre:do-register-groups (name version)
               (".*/(.*)-(\\d\..*)\.html" (namestring path))
-            (let ((system (asdf:find-system name)))
+            (let ((system (asdf:find-system name nil)))
               (when (and system
                          (not (string= version
                                        (asdf:component-version system))))
                 (delete-file path)
                 (delete-file (make-pathname :type "el"
                                             :defaults path))))))))
+
+(defvar *excluded-systems* nil
+  "Don't generate documentation for those systems.")
+
+(defun exclude-system (system-designator)
+  "Don't create documentation for SYSTEM-DESIGNATOR.
+See *EXCLUDED-SYSTEMS* for a list of excluded systems."
+  (pushnew system-designator *excluded-systems*))
