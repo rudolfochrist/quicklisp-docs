@@ -27,6 +27,8 @@
 
 (require 'hyperspec)
 (require 'slime)
+(require 'ivy)
+(require 'cl-lib)
 
 (defvar ql-docs--symbols (copy-hash-table common-lisp-hyperspec--symbols)
   "Mapping from symbol to URL.  URL can be a relative URL.")
@@ -65,7 +67,7 @@
                             ql-docs--symbols nil t
 			    stripped-symbol
                             'ql-docs--history)))))
-
+;;;###autoload
 (defun ql-docs-lookup-function (symbol-name)
   "Look up SYMBOL-NAME in documentation."
   (interactive (list (ql-docs-read-symbol-name (slime-symbol-at-point))))
@@ -76,18 +78,34 @@
                     (with-temp-buffer
                       (browse-url (car entry))))
                   (gethash symbol-name ql-docs--symbols)))))
-
+;;;###autoload
 (setq slime-documentation-lookup-function #'ql-docs-lookup-function)
 
+
+(defun ql-docs-documentation-files (extension)
+  "Returns a list of paths in `ql-docs-quicklisp-docs-home' with EXTENSION."
+  (mapcar (lambda (path)
+            (concat ql-docs-quicklisp-docs-home path))
+          (cl-remove-if-not (lambda (file)
+                              (string= extension (file-name-extension file)))
+                            (directory-files ql-docs-quicklisp-docs-home))))
+
+;;;###autoload
 (defun ql-docs-reload-docs ()
   "Reload documentation for files under `ql-docs-quicklisp-docs-home'."
   (interactive)
   (setq ql-docs--symbols (copy-hash-table common-lisp-hyperspec--symbols))
-  (mapc (lambda (file)
-          (load (concat ql-docs-quicklisp-docs-home file) t))
-        (cl-remove-if-not (lambda (file)
-                            (string= "el" (file-name-extension file)))
-                          (directory-files ql-docs-quicklisp-docs-home))))
+  (mapc #'load (ql-docs-documentation-files "el")))
+
+;;;###autoload
+(defun ql-docs-browse-library-documentation ()
+  "Opens the documentation for a selected library."
+  (interactive)
+  (ivy-read "%d Library: "
+            (ql-docs-documentation-files "html")
+            :action (lambda (path)
+                      (funcall ql-docs-browser-function
+                               (concat "file://" (expand-file-name path))))))
 
 (provide 'quicklisp-docs)
 
