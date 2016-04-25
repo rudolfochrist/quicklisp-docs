@@ -107,6 +107,9 @@
                       (funcall ql-docs-browser-function
                                (concat "file://" (expand-file-name path))))))
 
+(define-key slime-mode-map (kbd "C-c C-d l") #'ql-docs-browse-library-documentation)
+(define-key slime-repl-mode-map (kbd "C-c C-d l") #'ql-docs-browse-library-documentation)
+
 (provide 'quicklisp-docs)
 
 ;;; quicklisp-docs.el ends here
