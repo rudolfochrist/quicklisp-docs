@@ -1,1 +1,3 @@
 /*.fasl
+/.DS_Store
+*.elc

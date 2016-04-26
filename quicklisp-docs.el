@@ -27,6 +27,7 @@
 
 (require 'hyperspec)
 (require 'slime)
+(require 'slime-repl)
 (require 'ivy)
 (require 'cl-lib)
 
