@@ -49,7 +49,7 @@ provided by the staple system, but omitting some CSS to work better in EWW \(Ema
   (when (atom system-specs)
     (setf system-specs (list system-specs)))
   (loop for system in system-specs
-     unless (member system *excluded-systems*)
+     unless (member system *excluded-systems* :test #'string-equal)
      do
        (let ((path (make-doc-path system)))
          (unless (file-exists-p path)
@@ -83,4 +83,4 @@ provided by the staple system, but omitting some CSS to work better in EWW \(Ema
 (defun exclude-system (system-designator)
   "Don't create documentation for SYSTEM-DESIGNATOR.
 See *EXCLUDED-SYSTEMS* for a list of excluded systems."
-  (pushnew system-designator *excluded-systems*))
+  (pushnew (string system-designator) *excluded-systems*))
