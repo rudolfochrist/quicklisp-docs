@@ -9,6 +9,11 @@
                                                                   ql:*quicklisp-home*))
   "Directory to install library documentation.")
 
+(defvar *template-path* (merge-pathnames "template.ctml"
+                                         (asdf:system-source-directory :quicklisp-docs))
+  "Clip template to use to generate the documentation. Defaults to the standard template
+provided by the staple system, but omitting some CSS to work better in EWW \(Emacs\).")
+
 (defvar *emacs-lib-template*
   "(mapc (lambda (entry)
          (ql-docs-insert (car entry) (cadr entry)))
@@ -27,10 +32,11 @@
   (let ((symbols '())
         (path (namestring base-path)))
     (do-external-symbols (symbol (find-package package) symbols)
-      (let ((downcase-symbol (string-downcase (symbol-name symbol))))
-        (push (list downcase-symbol
-                    (concatenate 'string "file://" path "#" downcase-symbol))
-              symbols)))))
+      (push (list (symbol-name symbol)
+                  (concatenate 'string
+                               "file://" path "#"
+                               (package-name package) ":" (symbol-name symbol)))
+            symbols))))
 
 (defun write-emacs-file (system symbols)
   (with-open-file (file (make-doc-path system :extension "el")
@@ -50,9 +56,9 @@
            (when (find-package system)
              (let ((symbols (make-external-symbol-table system path)))
                (unless (null symbols)
-                 (create-template system :target path)
+                 (staple:generate system :out path :template *template-path*)
                  (write-emacs-file system symbols)
-                 (print "Documentation created."))))))))
+                 (princ "Documentation created."))))))))
 
 
 (defun remove-outdated-docs ()

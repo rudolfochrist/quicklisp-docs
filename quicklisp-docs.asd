@@ -10,7 +10,7 @@
   :serial t
   :components ((:file "package")
                (:file "quicklisp-docs"))
-  :depends-on (#:documentation-template
+  :depends-on (#:staple
                #:cl-fad
                #:cl-ppcre)
   :in-order-to ((test-op (test-op quicklisp-docs.test))))
