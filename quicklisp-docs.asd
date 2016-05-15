@@ -9,8 +9,10 @@
   :source-control (:git "git@github.com:rudolfochrist/quicklisp-docs.git")
   :serial t
   :components ((:file "package")
-               (:file "quicklisp-docs"))
-  :depends-on (#:staple
+               (:file "quicklisp-docs")
+               (:file "generator"))
+  :depends-on (#:trivial-documentation
+               #:cl-who
                #:cl-fad
                #:cl-ppcre)
   :in-order-to ((test-op (test-op quicklisp-docs.test))))
