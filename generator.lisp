@@ -17,10 +17,10 @@
           (:title (who:str (package-name package)))
           (:style (who:str (who:conc
                             "body { margin: 2% 5%; }"
-                            "h3 span { color: grey; }"
-                            "li { margin-top: 5%; list-style: none; }"))))
+                            "li { margin-top: 5%; list-style: none; }"
+                            "p.doc { margin: 5% 2%; }"))))
          (:body
-          (:h3 (who:str (package-name package))
+          (:h2 (who:str (package-name package))
                (when package-doc
                  (who:htm (:span (who:fmt "- ~A" package-doc)))))
           (:ul
@@ -41,5 +41,6 @@
                             (who:htm (:b (who:str symb)))
                             (who:htm (:em (who:fmt "~{~A~^ ~}"(getf (first props) :lambda-list))))
                             (who:str ") NEW-VALUE)"))))) 
-                       (:p (who:str (getf (first props) :documentation)))))))))))))
+                       (:p :class "doc"
+                           (who:str (getf (first props) :documentation)))))))))))))
   (values)) 
