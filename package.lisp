@@ -8,6 +8,5 @@
   (:export
    #:*ql-docs-home*
    #:*excluded-systems*
-   #:*template-path*
    #:remove-outdated-docs
    #:exclude-system))
