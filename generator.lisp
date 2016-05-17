@@ -5,6 +5,14 @@
 (defun accessorp (symbol)
   (fboundp `(setf ,symbol)))
 
+(defun split-documentation (docstring)
+  "Splits the DOCSTING on two newlines to preserve paragraphs."
+  (flet ((empty-string-p (string)
+           (declare (type string string)
+                    (optimize speed space))
+           (= 0 (length string))))
+    (remove-if #'empty-string-p (cl-ppcre:split "\\n{2}" docstring))))
+
 (defun generate-docs (package filespec &key (if-exists :rename-and-delete))
   "Generate HTML documentation for PACKAGE and write it to FILE."
   (setf (who:html-mode) :html5)
@@ -18,7 +26,7 @@
           (:style (who:str (who:conc
                             "body { margin: 2% 5%; }"
                             "li { margin-top: 5%; list-style: none; }"
-                            "p.doc { margin: 5% 2%; }"))))
+                            "p.doc { margin: 2%; }"))))
          (:body
           (:h2 (who:str (package-name package))
                (when package-doc
@@ -41,6 +49,8 @@
                             (who:htm (:b (who:str symb)))
                             (who:htm (:em (who:fmt "~{~A~^ ~}"(getf (first props) :lambda-list))))
                             (who:str ") NEW-VALUE)"))))) 
-                       (:p :class "doc"
-                           (who:str (getf (first props) :documentation)))))))))))))
+                       (loop for doc in (split-documentation (getf (first props) :documentation))
+                          do (who:htm
+                              (:p :class "doc"
+                                  (who:str doc))))))))))))))
   (values)) 

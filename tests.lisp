@@ -20,7 +20,8 @@
       (delete-directory-and-files *ql-docs-home*))))
 
 (defun touch (pathspec)
-  (with-open-file (s pathspec :direction :output :if-does-not-exist :create :if-exists :supersede)))
+  (with-open-file (s pathspec :direction :output :if-does-not-exist :create :if-exists :supersede)
+    (declare (ignore s))))
 
 (test remove-outdated
   (let ((*ql-docs-home* #p "/tmp/ql-docs/"))
