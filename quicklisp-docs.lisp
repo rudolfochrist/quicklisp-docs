@@ -38,21 +38,24 @@
                         :if-exists nil)
     (format file *emacs-lib-template* symbols)))
 
+(defun install-docs (system)
+  "Installs the documentation for SYSTEM."
+  (let ((path (make-doc-path system)))
+    (unless (file-exists-p path)
+      (when (find-package system)
+        (let ((symbols (make-external-symbol-table system path)))
+          (unless (null symbols)
+            (generate-docs system path)
+            (write-emacs-file system symbols)
+            (princ "Documentation created.")))))))
+
 (defmethod quickload :after (system-specs &key verbose silent prompt explain)
   (declare (ignore verbose silent prompt explain))
   (when (atom system-specs)
     (setf system-specs (list system-specs)))
   (loop for system in system-specs
      unless (member system *excluded-systems* :test #'string-equal)
-     do
-       (let ((path (make-doc-path system)))
-         (unless (file-exists-p path)
-           (when (find-package system)
-             (let ((symbols (make-external-symbol-table system path)))
-               (unless (null symbols)
-                 (generate-docs system path)
-                 (write-emacs-file system symbols)
-                 (princ "Documentation created."))))))))
+     do (install-documentation system)))
 
 
 (defun remove-outdated-docs ()
