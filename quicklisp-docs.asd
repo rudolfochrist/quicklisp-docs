@@ -14,7 +14,8 @@
   :depends-on (#:trivial-documentation
                #:cl-who
                #:cl-fad
-               #:cl-ppcre)
+               #:cl-ppcre
+               #:alexandria)
   :in-order-to ((test-op (test-op quicklisp-docs.test))))
 
 (asdf:defsystem #:quicklisp-docs.test

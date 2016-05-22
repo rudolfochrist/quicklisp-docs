@@ -5,6 +5,8 @@
   (:use #:cl :cl-fad)
   (:import-from #:quicklisp
                 #:quickload)
+  (:import-from #:alexandria
+                #:make-keyword)
   (:export
    #:*ql-docs-home*
    #:*excluded-systems*
