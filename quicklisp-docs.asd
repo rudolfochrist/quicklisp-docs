@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:quicklisp-docs
   :description "Documentation generator for Quicklisp installed libraries."
-  :version "0.5.0"
+  :version "0.5.1"
   :author "Sebastian Christ <rudolfo.christ@gmail.com>"
   :license "MIT"
   :homepage "https://github.com/rudolfochrist/quicklisp-docs"
