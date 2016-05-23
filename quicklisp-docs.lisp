@@ -1,4 +1,6 @@
-;;;; quicklisp-docs.lisp
+;;; -*- mode: Lisp; common-lisp-style: modern; slime-coding: utf-8-unix -*-
+;;;
+;;; quicklisp-docs.lisp
 
 (in-package #:quicklisp-docs)
 
@@ -14,12 +16,16 @@
          (ql-docs-insert (car entry) (cadr entry)))
       '~S)")
 
+(defun replace-slashes (string &optional (char #\-))
+  "Replaces every #\/ in STRING with CHAR."
+  (ppcre:regex-replace-all "\\/" string (string char)))
+
 (defun make-doc-path (system-name &key (extension "html"))
   (let ((system (asdf:find-system system-name)))
     (merge-pathnames-as-file *ql-docs-home*
                              (pathname-as-file
                               (format nil "~A-~A.~A"
-                                      (asdf:component-name system)
+                                      (replace-slashes (asdf:component-name system))
                                       (asdf:component-version system)
                                       extension)))))
 
