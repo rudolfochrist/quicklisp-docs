@@ -20,6 +20,12 @@
   "Replaces every #\/ in STRING with CHAR."
   (ppcre:regex-replace-all "\\/" string (string char)))
 
+(defun make-system-designator (system)
+  "Unifies system designators for this package. Results in using keywords."
+  (if (keywordp system)
+      system
+      (make-keyword (string-upcase (string system)))))
+
 (defun make-doc-path (system-name &key (extension "html"))
   (let ((system (asdf:find-system system-name)))
     (merge-pathnames-as-file *ql-docs-home*
@@ -47,7 +53,9 @@
 (defun install-documentation (system)
   "Installs the documentation for SYSTEM."
   (let ((path (make-doc-path system)))
-    (when (and (not (file-exists-p path))
+    (ensure-directories-exist path)
+    (when (and (not (member system *excluded-systems*))
+               (not (file-exists-p path))
                (find-package system))
       (let ((symbols (make-external-symbol-table system path)))
         (unless (null symbols)
@@ -58,13 +66,12 @@
 (defmethod quickload :after (system-specs &key verbose silent prompt explain)
   (declare (ignore verbose silent prompt explain))
   (when (atom system-specs)
-    (setf system-specs (list system-specs)))
-  (loop for system in system-specs
-        unless (member system *excluded-systems* :test #'string-equal)
-          do (progn
-               (install-documentation system)
-               (loop for dependecy in (asdf:system-depends-on (asdf:find-system system))
-                     do (install-documentation (make-keyword (string-upcase dependecy)))))))
+    (setf system-specs (list system-specs))) 
+  (loop for system in (mapcar #'make-system-designator system-specs)
+        do (progn
+             (install-documentation system)
+             (loop for dependecy in (asdf:system-depends-on (asdf:find-system system))
+                   do (install-documentation (make-system-designator dependecy))))))
 
 
 (defun remove-outdated-docs ()
@@ -73,20 +80,22 @@
                             (string= "el" (pathname-type path)))
                           (list-directory *ql-docs-home*))))
     (loop for path in paths
-       do (ppcre:do-register-groups (name version)
-              (".*/(.*)-(\\d\..*)\.html" (namestring path))
-            (let ((system (asdf:find-system name nil)))
-              (when (and system
-                         (not (string= version
-                                       (asdf:component-version system))))
-                (delete-file path)
-                (delete-file (make-pathname :type "el"
-                                            :defaults path))))))))
+          do (ppcre:do-register-groups (name version)
+                 (".*/(.*)-(\\d\..*)\.html" (namestring path))
+               (let ((system (asdf:find-system name nil)))
+                 (when (and system
+                            (not (string= version
+                                          (asdf:component-version system))))
+                   (delete-file path)
+                   (delete-file (make-pathname :type "el"
+                                               :defaults path))))))))
 
-(defvar *excluded-systems* nil
+(defvar *excluded-systems*
+  #+abcl (list :jss)
+  #-abcl nil
   "Don't generate documentation for those systems.")
 
-(defun exclude-system (system-designator)
+(defun exclude-system (system)
   "Don't create documentation for SYSTEM-DESIGNATOR.
 See *EXCLUDED-SYSTEMS* for a list of excluded systems."
-  (pushnew (string system-designator) *excluded-systems*))
+  (pushnew (make-system-designator system) *excluded-systems*))
