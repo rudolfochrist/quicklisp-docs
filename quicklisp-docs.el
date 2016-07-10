@@ -25,8 +25,8 @@
 
 ;;; Code:
 
-(require 'hyperspec)
 (require 'slime)
+(require 'hyperspec)
 (require 'slime-repl)
 (require 'ivy)
 (require 'cl-lib)
